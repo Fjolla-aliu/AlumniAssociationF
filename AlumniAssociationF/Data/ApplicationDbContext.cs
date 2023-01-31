@@ -14,6 +14,7 @@ namespace AlumniAssociationF.Data
 
         public DbSet<Events> Events { get; set; }
         public DbSet<Partners> Partners { get; set; }
+        public DbSet<AlumniAssociationF.Models.News> News { get; set; }
 
     }
 }
