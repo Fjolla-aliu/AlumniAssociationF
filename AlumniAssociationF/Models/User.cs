@@ -6,16 +6,16 @@ namespace AlumniAssociationF.Models
     public class User : IdentityUser
     {
         public int Id { get; set; }
-        public string Emri { get; set; }    
-        public string Mbiemri { get; set; }
-        public DateTime DataLindjes { get; set; }
-        public string NumriTelefonit { get; set; }
+        public string Username { get; set; }    
+       
+        public string Email { get; set; }
 
-        /* 1- simple user, 2- registered, 3-ceo user, 4-*/
+        public byte[] PasswordHash { get; set; }
+        public string RefreshToken { get; set; }    
+        public DateTime TokenCreated { get; set; }
+        public DateTime TokenExpires { get; set; }
 
-        public int Role { get; set; }
 
-        
 
     }
 }
