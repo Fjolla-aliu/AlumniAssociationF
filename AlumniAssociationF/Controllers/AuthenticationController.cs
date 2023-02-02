@@ -20,10 +20,10 @@ namespace AlumniAssociationF.Controllers
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
 
-        public AuthenticationController(IConfiguration configuration)//, IUserService userService
+        public AuthenticationController(IConfiguration configuration, IUserService userService)
         {
            _configuration = configuration;
-           // _userService = userService;
+            _userService = userService;
         }
 
                 [HttpGet, Authorize]
@@ -31,6 +31,11 @@ namespace AlumniAssociationF.Controllers
              {
             var Name = _userService.GetMyName();
             return Ok(Name);
+
+            //var Name = User?.Identity?.Name;
+            //var Name2 = User?.FindFirstValue(ClaimTypes.Name);
+            //var role = User?.FindFirstValue(ClaimTypes.Role);
+            //return Ok(new {Name, Name2, role });
              }
 
         [HttpPost("register")]
