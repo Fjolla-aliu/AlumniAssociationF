@@ -26,12 +26,12 @@ namespace AlumniAssociationF.Controllers
            // _userService = userService;
         }
 
-       // [HttpGet, Authorize]
-      //  public ActionResult<string> GetMe()
-      //  {
-        //    var Name = _userService.GetMyName();
-       //     return Ok(Name);
-       // }
+                [HttpGet, Authorize]
+             public ActionResult<string> GetMe()
+             {
+            var Name = _userService.GetMyName();
+            return Ok(Name);
+             }
 
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserRegistration request)
@@ -119,7 +119,7 @@ namespace AlumniAssociationF.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Name),
-              //  new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, "Admin")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

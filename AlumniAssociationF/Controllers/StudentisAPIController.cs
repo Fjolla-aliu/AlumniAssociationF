@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniAssociationF.Data;
 using AlumniAssociationF.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AlumniAssociationF.Controllers
 {
@@ -44,7 +45,7 @@ namespace AlumniAssociationF.Controllers
 
         // PUT: api/StudentisAPI/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin") ]
         public async Task<IActionResult> PutStudenti(int id, Studenti studenti)
         {
             if (id != studenti.Id)
@@ -75,7 +76,7 @@ namespace AlumniAssociationF.Controllers
 
         // POST: api/StudentisAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost ,Authorize(Roles = "Admin")]
         public async Task<ActionResult<Studenti>> PostStudenti(Studenti studenti)
         {
             _context.Students.Add(studenti);
@@ -85,7 +86,7 @@ namespace AlumniAssociationF.Controllers
         }
 
         // DELETE: api/StudentisAPI/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"),Authorize (Roles = "Admin")]
         public async Task<IActionResult> DeleteStudenti(int id)
         {
             var studenti = await _context.Students.FindAsync(id);
