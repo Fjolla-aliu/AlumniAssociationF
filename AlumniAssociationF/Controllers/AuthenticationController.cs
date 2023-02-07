@@ -8,6 +8,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using AlumniAssociationF.Models;
 using AlumniAssociationF.Services.UserService;
+using AlumniAssociationF.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using NuGet.Common;
+using System.Xml.Linq;
 
 namespace AlumniAssociationF.Controllers
 {
@@ -15,15 +20,23 @@ namespace AlumniAssociationF.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-
+        private readonly ApplicationDbContext _context;
         public static User user = new User();
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
 
-        public AuthenticationController(IConfiguration configuration, IUserService userService)
+
+
+        public AuthenticationController(ApplicationDbContext context,IConfiguration configuration, IUserService userService, UserManager<IdentityUser> _userManager, RoleManager<IdentityRole>_roleManager)
         {
-           _configuration = configuration;
+            _context = context;
+            _configuration = configuration;
             _userService = userService;
+            userManager = _userManager;
+            roleManager = _roleManager;
+
         }
 
                 [HttpGet, Authorize]
@@ -32,67 +45,157 @@ namespace AlumniAssociationF.Controllers
             var Name = _userService.GetMyName();
             return Ok(Name);
 
-            //var Name = User?.Identity?.Name;
-            //var Name2 = User?.FindFirstValue(ClaimTypes.Name);
-            //var role = User?.FindFirstValue(ClaimTypes.Role);
-            //return Ok(new {Name, Name2, role });
+           
              }
 
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserRegistration request)
         {
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            if (_context.Users.Any(u => u.UserName == request.Email))
+            {
+                return BadRequest("User already exists.");
+            }
 
-            user.Name = request.Name;
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            CreatePasswordHash(request.Password,
+                 out byte[] passwordHash,
+                 out byte[] passwordSalt);
+
+          
+            var user = new User
+            {
+                UserName = request.Email,
+                Name = request.UserName,
+                PasswordH = passwordHash,
+                PasswordSalt = passwordSalt,
+                VerificationToken = CreateRandomToken()
+
+            };
+            string token = CreateToken(user);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            if (await roleManager.RoleExistsAsync(UserRoles.User))
+            {
+                await userManager.AddToRoleAsync(user, UserRoles.User);
+            }
+          
+
+            return Ok(token);
+
+        }
+        [HttpPost("registeradmin")]
+        public async Task<ActionResult<User>> RegisterAdmin(UserRegistration request)
+        {
+            if (_context.Users.Any(u => u.UserName == request.Email))
+            {
+                return BadRequest("User already exists.");
+            }
+
+            CreatePasswordHash(request.Password,
+                 out byte[] passwordHash,
+                 out byte[] passwordSalt);
 
 
-            return Ok(user);
+            var user = new User
+            {
+                UserName = request.Email,
+                Name = request.UserName,
+                PasswordH = passwordHash,
+                PasswordSalt = passwordSalt,
+                VerificationToken = CreateRandomToken()
+
+            };
+            string token = CreateToken(user);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+
+            if (await roleManager.RoleExistsAsync(UserRoles.Admin))
+            {
+                await userManager.AddToRoleAsync(user, UserRoles.Admin);
+            }
+            
+
+            return Ok(token);
+
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(UserRegistration request)
+        public async Task<IActionResult> Login(UserLoginRequest request)
         {
-            if (user.Name != request.Name)
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.Email);
+            if (user == null)
             {
                 return BadRequest("User not found.");
             }
 
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            if (!VerifyPasswordHash(request.Password, user.PasswordH, user.PasswordSalt))
             {
-                return BadRequest("Wrong password.");
+                return BadRequest("Password is incorrect.");
             }
-
             string token = CreateToken(user);
-
             var refreshToken = GenerateRefreshToken();
-            SetRefreshToken(refreshToken);
+        
 
-            return Ok(token);
+            user.RefreshToken = refreshToken.Token;
+            user.TokenCreated = refreshToken.Created;
+            user.TokenExpires = refreshToken.Expires;
+
+            await _context.SaveChangesAsync();
+
+           
+            return Ok(new LoginResponse
+            {
+                Name = user.Name,
+                Email = user.UserName,
+                Token = token,
+            });
+           
         }
 
-        [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshToken()
+       
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-            var refreshToken = Request.Cookies["refreshToken"];
-
-            if (!user.RefreshToken.Equals(refreshToken))
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == email);
+            if (user == null)
             {
-                return Unauthorized("Invalid Refresh Token.");
-            }
-            else if (user.TokenExpires < DateTime.Now)
-            {
-                return Unauthorized("Token expired.");
+                return BadRequest("User not found.");
             }
 
-            string token = CreateToken(user);
-            var newRefreshToken = GenerateRefreshToken();
-            SetRefreshToken(newRefreshToken);
+            user.PasswordResetToken = CreateRandomToken();
+            user.ResetTokenExpires = DateTime.Now.AddDays(1);
+            await _context.SaveChangesAsync();
 
-            return Ok(token);
+            return Ok("You may now reset your password.");
         }
 
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResettPassword(ResetPasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+            if (user == null || user.ResetTokenExpires < DateTime.Now)
+            {
+                return BadRequest("Invalid Token.");
+            }
+
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordH = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetToken = null;
+            user.ResetTokenExpires = null;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Password successfully reset.");
+        }
+  
+   
         private RefreshToken GenerateRefreshToken()
         {
             var refreshToken = new RefreshToken
@@ -104,21 +207,6 @@ namespace AlumniAssociationF.Controllers
 
             return refreshToken;
         }
-
-        private void SetRefreshToken(RefreshToken newRefreshToken)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = newRefreshToken.Expires
-            };
-            Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
-
-            user.RefreshToken = newRefreshToken.Token;
-            user.TokenCreated = newRefreshToken.Created;
-            user.TokenExpires = newRefreshToken.Expires;
-        }
-
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
@@ -147,7 +235,8 @@ namespace AlumniAssociationF.Controllers
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
 
@@ -155,9 +244,15 @@ namespace AlumniAssociationF.Controllers
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        private string CreateRandomToken()
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
         }
     }
 }

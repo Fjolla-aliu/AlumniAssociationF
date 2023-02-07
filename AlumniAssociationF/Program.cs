@@ -14,6 +14,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("*").AllowAnyHeader();
+        });
+});
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
@@ -22,6 +30,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpContextAccessor();
+
 
   
 
@@ -58,6 +67,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 
+
+app.UseCors();
 
 
 app.UseRouting();

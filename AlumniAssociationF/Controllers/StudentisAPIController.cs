@@ -23,14 +23,14 @@ namespace AlumniAssociationF.Controllers
         }
 
         // GET: api/StudentisAPI
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<Studenti>>> GetStudents()
         {
             return await _context.Students.ToListAsync();
         }
 
         // GET: api/StudentisAPI/5
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize]
         public async Task<ActionResult<Studenti>> GetStudenti(int id)
         {
             var studenti = await _context.Students.FindAsync(id);
