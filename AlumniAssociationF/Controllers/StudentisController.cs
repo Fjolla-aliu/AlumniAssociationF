@@ -16,19 +16,22 @@ namespace AlumniAssociationF.Controllers
     public class StudentisController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public StudentisController(ApplicationDbContext context)
+
+        public StudentisController(ApplicationDbContext context, UserManager<IdentityUser> _userManager)
         {
             _context = context;
+           userManager = _userManager;
         }
 
         // GET: Studentis
-        [Authorize(Roles = "User")]
-        /* public async Task<IActionResult> Index()
-         {
-             var id = User.Identities;
-             return View(await _context.Students.Where(u => u.UserId = id).ToListAsync());
-         } */
+
+        public async Task<IActionResult> Index()
+        {
+            var id =  userManager.GetUserId;
+            return View(await _context.Students.Where(u => u.UserId == id.ToString()).ToListAsync());
+        } 
 
         // GET: Studentis/Details/5
         public async Task<IActionResult> Details(int? id)

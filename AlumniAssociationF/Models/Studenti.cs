@@ -28,7 +28,7 @@ namespace AlumniAssociationF.Models
             public double AvGrade { get; set; }
             public string? Gender { get; set; }
             public string? JobStatus { get; set; }
-            public int? UserId { get; set; } 
+            public string? UserId { get; set; } 
 
 
 
