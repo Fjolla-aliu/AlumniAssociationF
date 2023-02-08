@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AlumniAssociationF.Models
 {
-    public class User : IdentityUser
+    public class ViewUser
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
@@ -13,7 +12,7 @@ namespace AlumniAssociationF.Models
         [Required]
         public byte[] PasswordH { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public string RefreshToken { get; set; }    
+        public string RefreshToken { get; set; }
         public DateTime TokenCreated { get; set; }
         public DateTime TokenExpires { get; set; }
         public string? VerificationToken { get; set; }
@@ -22,6 +21,7 @@ namespace AlumniAssociationF.Models
         public DateTime? ResetTokenExpires { get; set; }
 
         public string? Role { get; set; }
+
 
     }
 }

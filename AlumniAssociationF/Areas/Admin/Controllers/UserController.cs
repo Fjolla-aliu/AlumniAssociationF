@@ -1,13 +1,20 @@
 ﻿using AlumniAssociationF.Data;
 using AlumniAssociationF.Models;
 using AlumniAssociationF.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
+using System.Data;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace AlumniAssociationF.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+
+    //[Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly UserManager<IdentityUser> userManager;
@@ -22,77 +29,97 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
 
 
         // GET: UserController
-        public ActionResult Index()
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+           // return View(await userManager.Users.ToListAsync());
+
+            var filters = userManager.Users.ToList();
+
+            var filter = new List<User>();
+            foreach (var f in filters)
+            {
+              
+                
+                    filter.Add((User)f);
+                
+            }
+
+            
+            return View(filter);
         }
 
         // GET: UserController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> DetailsAsync(string id)
         {
-            return View();
+            if (id == null || userManager.Users == null)
+            {
+                return NotFound();
+            }
+
+            var studenti = await userManager.Users.FirstOrDefaultAsync(m => m.Id == id);
+            if (studenti == null)
+            {
+                return NotFound();
+            }
+
+            return View(studenti);
         }
 
         // GET: UserController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UserController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
+    
+    
         // GET: UserController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<IActionResult> Edit(string? id)
         {
-            return View();
+            if (id == null || userManager.Users == null)
+            {
+                return NotFound();
+            }
+
+            var studenti =  await userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (studenti == null)
+            {
+                return NotFound();
+            }
+            return View(studenti);
         }
 
         // POST: UserController/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+       // [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditAsync(User u)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            var user = await userManager.FindByIdAsync(u.Id);
 
-        // GET: UserController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: UserController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            if (user == null)
             {
-                return RedirectToAction(nameof(Index));
+                ViewBag.ErroreMessage = $"User with ID = {u.Id} cannot be found";
+                return View("NotFound");
             }
-            catch
+
+
+            if (user == null)
             {
-                return View();
+                ViewBag.ErroreMessage = $"User with ID = {u.Id} cannot be found";
+                return View("NotFound");
+            }
+            else
+            {
+                user.Email = u.Email;
+                user.UserName = u.UserName;
+
+                var result = await userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListUsers");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(u);
             }
         }
     }
