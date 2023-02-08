@@ -18,6 +18,7 @@ namespace AlumniAssociationF.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Faq> FAQs { get; set; }
         public DbSet<AlumniAssociationF.Models.ViewUser> ViewUser { get; set; }
+        public DbSet<AlumniAssociationF.Models.Center> Center { get; set; }
       
     }
 }
