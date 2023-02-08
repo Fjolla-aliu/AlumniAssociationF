@@ -14,10 +14,32 @@
             </div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-          
+           
+                <input type="hidden" asp-for="PasswordH" class="form-control" />
+            
+                <input type="hidden" asp-for="PasswordSalt" class="form-control" />
+              
+                <input type="hidden" asp-for="RefreshToken" class="form-control" />
+               
+                <input type="hidden" asp-for="TokenCreated" class="form-control" />
+              
+                <input type="hidden" asp-for="TokenExpires" class="form-control" />
+                
+                <input type="hidden" asp-for="VerificationToken" class="form-control" />
+            
+                <input type="hidden" asp-for="VerifiedAt" class="form-control" />
+              
+                <input type="hidden" asp-for="PasswordResetToken" class="form-control" />
+                
+            
+            <div class="form-group">
+                <label asp-for="ResetTokenExpires" class="control-label"></label>
+                <input type="hidden" asp-for="ResetTokenExpires" class="form-control" />
+                <span asp-validation-for="ResetTokenExpires" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Role" class="control-label"></label>
                 <input asp-for="Role" class="form-control" />

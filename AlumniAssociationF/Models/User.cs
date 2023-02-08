@@ -5,7 +5,7 @@ namespace AlumniAssociationF.Models
 {
     public class User : IdentityUser
     {
-        public string Id { get; set; }
+      
         [Required]
         public string Name { get; set; }
         [Required]

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using AlumniAssociationF.Data;
 using AlumniAssociationF.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Principal;
 
 namespace AlumniAssociationF.Controllers
 {
@@ -21,10 +23,12 @@ namespace AlumniAssociationF.Controllers
         }
 
         // GET: Studentis
-        public async Task<IActionResult> Index()
-        {
-              return View(await _context.Students.ToListAsync());
-        }
+        [Authorize(Roles = "User")]
+        /* public async Task<IActionResult> Index()
+         {
+             var id = User.Identities;
+             return View(await _context.Students.Where(u => u.UserId = id).ToListAsync());
+         } */
 
         // GET: Studentis/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -68,7 +72,7 @@ namespace AlumniAssociationF.Controllers
         }
 
         // GET: Studentis/Edit/5
-        [Authorize(Roles = "Admin, Publisher")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Edit(int? id)
         {

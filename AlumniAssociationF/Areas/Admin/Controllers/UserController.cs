@@ -51,14 +51,15 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
         }
 
         // GET: UserController/Details/5
-        public async Task<ActionResult> DetailsAsync(string id)
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null || userManager.Users == null)
             {
                 return NotFound();
             }
 
-            var studenti = await userManager.Users.FirstOrDefaultAsync(m => m.Id == id);
+            var studenti = await userManager.Users.FirstOrDefaultAsync(m => m.Id == id.ToString());
             if (studenti == null)
             {
                 return NotFound();
@@ -68,17 +69,18 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
         }
 
         // GET: UserController/Create
-    
-    
+
+
         // GET: UserController/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(string? id)
         {
             if (id == null || userManager.Users == null)
             {
                 return NotFound();
             }
-
-            var studenti =  await userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            
+            var studenti =  await userManager.Users.FirstOrDefaultAsync(u => u.Id ==id.ToString());
             if (studenti == null)
             {
                 return NotFound();
@@ -88,8 +90,8 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
 
         // POST: UserController/Edit/5
         [HttpPost]
-       // [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync(User u)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(User u)
         {
             var user = await userManager.FindByIdAsync(u.Id);
 
@@ -107,13 +109,14 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
             }
             else
             {
-                user.Email = u.Email;
-                user.UserName = u.UserName;
+                user = u;
 
+                
+                
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("ListUsers");
+                    return RedirectToAction("/");
                 }
                 foreach (var error in result.Errors)
                 {

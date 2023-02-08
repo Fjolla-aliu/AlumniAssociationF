@@ -68,7 +68,8 @@ namespace AlumniAssociationF.Controllers
                 Name = request.UserName,
                 PasswordH = passwordHash,
                 PasswordSalt = passwordSalt,
-                VerificationToken = CreateRandomToken()
+                VerificationToken = CreateRandomToken(),
+                Role = "User"
 
             };
             string token = CreateToken(user);
@@ -105,7 +106,8 @@ namespace AlumniAssociationF.Controllers
                 Name = request.UserName,
                 PasswordH = passwordHash,
                 PasswordSalt = passwordSalt,
-                VerificationToken = CreateRandomToken()
+                VerificationToken = CreateRandomToken(),
+                Role = "Admin"
 
             };
             string token = CreateToken(user);
