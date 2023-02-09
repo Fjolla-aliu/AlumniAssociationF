@@ -152,6 +152,7 @@ namespace AlumniAssociationF.Controllers
            
             return Ok(new LoginResponse
             {
+                Id = user.Id,
                 Name = user.Name,
                 Email = user.UserName,
                 Token = token,

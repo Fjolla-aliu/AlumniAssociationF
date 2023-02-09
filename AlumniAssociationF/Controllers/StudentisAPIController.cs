@@ -76,7 +76,7 @@ namespace AlumniAssociationF.Controllers
 
         // POST: api/StudentisAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost ,Authorize(Roles = "Admin")]
+        [HttpPost ,Authorize]
         public async Task<ActionResult<Studenti>> PostStudenti(Studenti studenti)
         {
             _context.Students.Add(studenti);
