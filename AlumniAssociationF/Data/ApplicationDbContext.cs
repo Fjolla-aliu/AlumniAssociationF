@@ -20,6 +20,7 @@ namespace AlumniAssociationF.Data
         public DbSet<AlumniAssociationF.Models.ViewUser> ViewUser { get; set; }
         public DbSet<AlumniAssociationF.Models.About> About { get; set; }
         public DbSet<AlumniAssociationF.Models.Center> Center { get; set; }
+        public DbSet<AlumniAssociationF.Models.Team> Team { get; set; }
       
     }
 }
