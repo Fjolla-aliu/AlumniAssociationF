@@ -12,47 +12,47 @@ namespace AlumniAssociationF.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsAPIController : ControllerBase
+    public class OurProgramsAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public EventsAPIController(ApplicationDbContext context)
+        public OurProgramsAPIController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/EventsAPI
+        // GET: api/OurProgramsAPI
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Eventet>>> GetEventet()
+        public async Task<ActionResult<IEnumerable<OurProgram>>> GetOurProgram()
         {
-            return await _context.Eventet.ToListAsync();
+            return await _context.OurProgram.ToListAsync();
         }
 
-        // GET: api/EventsAPI/5
+        // GET: api/OurProgramsAPI/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Eventet>> GetEventet(int id)
+        public async Task<ActionResult<OurProgram>> GetOurProgram(int id)
         {
-            var eventet = await _context.Eventet.FindAsync(id);
+            var ourProgram = await _context.OurProgram.FindAsync(id);
 
-            if (eventet == null)
+            if (ourProgram == null)
             {
                 return NotFound();
             }
 
-            return eventet;
+            return ourProgram;
         }
 
-        // PUT: api/EventsAPI/5
+        // PUT: api/OurProgramsAPI/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEventet(int id, Eventet eventet)
+        public async Task<IActionResult> PutOurProgram(int id, OurProgram ourProgram)
         {
-            if (id != eventet.Id)
+            if (id != ourProgram.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(eventet).State = EntityState.Modified;
+            _context.Entry(ourProgram).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace AlumniAssociationF.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventetExists(id))
+                if (!OurProgramExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace AlumniAssociationF.Controllers
             return NoContent();
         }
 
-        // POST: api/EventsAPI
+        // POST: api/OurProgramsAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Eventet>> PostEventet(Eventet eventet)
+        public async Task<ActionResult<OurProgram>> PostOurProgram(OurProgram ourProgram)
         {
-            _context.Eventet.Add(eventet);
+            _context.OurProgram.Add(ourProgram);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEventet", new { id = eventet.Id }, eventet);
+            return CreatedAtAction("GetOurProgram", new { id = ourProgram.Id }, ourProgram);
         }
 
-        // DELETE: api/EventsAPI/5
+        // DELETE: api/OurProgramsAPI/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEventet(int id)
+        public async Task<IActionResult> DeleteOurProgram(int id)
         {
-            var eventet = await _context.Eventet.FindAsync(id);
-            if (eventet == null)
+            var ourProgram = await _context.OurProgram.FindAsync(id);
+            if (ourProgram == null)
             {
                 return NotFound();
             }
 
-            _context.Eventet.Remove(eventet);
+            _context.OurProgram.Remove(ourProgram);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool EventetExists(int id)
+        private bool OurProgramExists(int id)
         {
-            return _context.Eventet.Any(e => e.Id == id);
+            return _context.OurProgram.Any(e => e.Id == id);
         }
     }
 }

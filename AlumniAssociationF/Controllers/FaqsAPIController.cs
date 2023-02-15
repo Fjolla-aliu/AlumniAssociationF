@@ -12,47 +12,47 @@ namespace AlumniAssociationF.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsAPIController : ControllerBase
+    public class FaqsAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public EventsAPIController(ApplicationDbContext context)
+        public FaqsAPIController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/EventsAPI
+        // GET: api/FaqsAPI
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Eventet>>> GetEventet()
+        public async Task<ActionResult<IEnumerable<Faq>>> GetFAQs()
         {
-            return await _context.Eventet.ToListAsync();
+            return await _context.FAQs.ToListAsync();
         }
 
-        // GET: api/EventsAPI/5
+        // GET: api/FaqsAPI/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Eventet>> GetEventet(int id)
+        public async Task<ActionResult<Faq>> GetFaq(int id)
         {
-            var eventet = await _context.Eventet.FindAsync(id);
+            var faq = await _context.FAQs.FindAsync(id);
 
-            if (eventet == null)
+            if (faq == null)
             {
                 return NotFound();
             }
 
-            return eventet;
+            return faq;
         }
 
-        // PUT: api/EventsAPI/5
+        // PUT: api/FaqsAPI/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEventet(int id, Eventet eventet)
+        public async Task<IActionResult> PutFaq(int id, Faq faq)
         {
-            if (id != eventet.Id)
+            if (id != faq.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(eventet).State = EntityState.Modified;
+            _context.Entry(faq).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace AlumniAssociationF.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventetExists(id))
+                if (!FaqExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace AlumniAssociationF.Controllers
             return NoContent();
         }
 
-        // POST: api/EventsAPI
+        // POST: api/FaqsAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Eventet>> PostEventet(Eventet eventet)
+        public async Task<ActionResult<Faq>> PostFaq(Faq faq)
         {
-            _context.Eventet.Add(eventet);
+            _context.FAQs.Add(faq);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEventet", new { id = eventet.Id }, eventet);
+            return CreatedAtAction("GetFaq", new { id = faq.Id }, faq);
         }
 
-        // DELETE: api/EventsAPI/5
+        // DELETE: api/FaqsAPI/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEventet(int id)
+        public async Task<IActionResult> DeleteFaq(int id)
         {
-            var eventet = await _context.Eventet.FindAsync(id);
-            if (eventet == null)
+            var faq = await _context.FAQs.FindAsync(id);
+            if (faq == null)
             {
                 return NotFound();
             }
 
-            _context.Eventet.Remove(eventet);
+            _context.FAQs.Remove(faq);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool EventetExists(int id)
+        private bool FaqExists(int id)
         {
-            return _context.Eventet.Any(e => e.Id == id);
+            return _context.FAQs.Any(e => e.Id == id);
         }
     }
 }

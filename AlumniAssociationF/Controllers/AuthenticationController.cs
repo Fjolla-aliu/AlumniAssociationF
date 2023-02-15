@@ -30,7 +30,7 @@ namespace AlumniAssociationF.Controllers
 
 
 
-        public AuthenticationController(ApplicationDbContext context,IConfiguration configuration, IUserService userService, UserManager<IdentityUser> _userManager, RoleManager<IdentityRole>_roleManager)
+        public AuthenticationController(ApplicationDbContext context,IConfiguration configuration , IUserService userService, UserManager<IdentityUser> _userManager, RoleManager<IdentityRole>_roleManager)
         {
             _context = context;
             _configuration = configuration;
@@ -38,9 +38,10 @@ namespace AlumniAssociationF.Controllers
             userManager = _userManager;
             roleManager = _roleManager;
 
+
         }
 
-                [HttpGet, Authorize]
+        [HttpGet, Authorize]
              public ActionResult<string> GetMe()
              {
             var Name = _userService.GetMyName();
@@ -141,7 +142,7 @@ namespace AlumniAssociationF.Controllers
             }
             string token = CreateToken(user);
             var refreshToken = GenerateRefreshToken();
-        
+                
 
             user.RefreshToken = refreshToken.Token;
             user.TokenCreated = refreshToken.Created;
@@ -156,6 +157,7 @@ namespace AlumniAssociationF.Controllers
                 Name = user.Name,
                 Email = user.UserName,
                 Token = token,
+                Role = user.Role
             });
            
         }

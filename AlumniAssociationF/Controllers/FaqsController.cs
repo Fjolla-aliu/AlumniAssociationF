@@ -7,105 +7,88 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AlumniAssociationF.Data;
 using AlumniAssociationF.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Principal;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace AlumniAssociationF.Controllers
 {
-    public class StudentisController : Controller
+    public class FaqsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        public StudentisController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, UserManager<IdentityUser> _userManager)
+        public FaqsController(ApplicationDbContext context)
         {
-            
             _context = context;
-           userManager = _userManager;
-           _httpContextAccessor = httpContextAccessor;
         }
-        // GET: Studentis/
-        [HttpGet]
-        public async Task<IActionResult> Index(string id)
+
+        // GET: Faqs
+        public async Task<IActionResult> Index()
         {
-            return View(_context.Students.Where(u => u.UserId == id).ToList());
+              return View(await _context.FAQs.ToListAsync());
         }
 
-        // GET: Studentis/Details/5
-
+        // GET: Faqs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Students == null)
+            if (id == null || _context.FAQs == null)
             {
                 return NotFound();
             }
 
-            var studenti = await _context.Students
+            var faq = await _context.FAQs
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (studenti == null)
+            if (faq == null)
             {
                 return NotFound();
             }
 
-            return View(studenti);
+            return View(faq);
         }
 
-        // GET: Studentis/Create
+        // GET: Faqs/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Studentis/Create
+        // POST: Faqs/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Create([Bind("Id,Name,Surname,Birthday,Email,Contact,City,State,University,AvGrade,Gender,JobStatus")] Studenti studenti)
+        public async Task<IActionResult> Create([Bind("Id,Question,Answer")] Faq faq)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(studenti);
+                _context.Add(faq);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(studenti);
+            return View(faq);
         }
 
-        // GET: Studentis/Edit/5
-        [Authorize(Roles = "Admin")]
-
+        // GET: Faqs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Students == null)
+            if (id == null || _context.FAQs == null)
             {
                 return NotFound();
             }
 
-            var studenti = await _context.Students.FindAsync(id);
-            if (studenti == null)
+            var faq = await _context.FAQs.FindAsync(id);
+            if (faq == null)
             {
                 return NotFound();
             }
-            return View(studenti);
+            return View(faq);
         }
 
-        // POST: Studentis/Edit/5
+        // POST: Faqs/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Surname,Birthday,Email,Contact,City,State,University,AvGrade,Gender,JobStatus")] Studenti studenti)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Question,Answer")] Faq faq)
         {
-            if (id != studenti.Id)
+            if (id != faq.Id)
             {
                 return NotFound();
             }
@@ -114,12 +97,12 @@ namespace AlumniAssociationF.Controllers
             {
                 try
                 {
-                    _context.Update(studenti);
+                    _context.Update(faq);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StudentiExists(studenti.Id))
+                    if (!FaqExists(faq.Id))
                     {
                         return NotFound();
                     }
@@ -130,50 +113,49 @@ namespace AlumniAssociationF.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(studenti);
+            return View(faq);
         }
 
-        [Authorize(Roles = "Admin")]
-        // GET: Studentis/Delete/5
+        // GET: Faqs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Students == null)
+            if (id == null || _context.FAQs == null)
             {
                 return NotFound();
             }
 
-            var studenti = await _context.Students
+            var faq = await _context.FAQs
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (studenti == null)
+            if (faq == null)
             {
                 return NotFound();
             }
 
-            return View(studenti);
+            return View(faq);
         }
 
-        // POST: Studentis/Delete/5
+        // POST: Faqs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Students == null)
+            if (_context.FAQs == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Students'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.FAQs'  is null.");
             }
-            var studenti = await _context.Students.FindAsync(id);
-            if (studenti != null)
+            var faq = await _context.FAQs.FindAsync(id);
+            if (faq != null)
             {
-                _context.Students.Remove(studenti);
+                _context.FAQs.Remove(faq);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool StudentiExists(int id)
+        private bool FaqExists(int id)
         {
-          return _context.Students.Any(e => e.Id == id);
+          return _context.FAQs.Any(e => e.Id == id);
         }
     }
 }

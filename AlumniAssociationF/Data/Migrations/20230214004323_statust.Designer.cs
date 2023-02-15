@@ -4,6 +4,7 @@ using AlumniAssociationF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlumniAssociationF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230214004323_statust")]
+    partial class statust
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,7 +67,7 @@ namespace AlumniAssociationF.Data.Migrations
                     b.ToTable("Center");
                 });
 
-            modelBuilder.Entity("AlumniAssociationF.Models.Event", b =>
+            modelBuilder.Entity("AlumniAssociationF.Models.Events", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,14 +93,7 @@ namespace AlumniAssociationF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OurProgramId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProgramId")
+                    b.Property<int>("OurProgramId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -109,53 +104,7 @@ namespace AlumniAssociationF.Data.Migrations
 
                     b.HasIndex("OurProgramId");
 
-                    b.HasIndex("ProgramId");
-
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("AlumniAssociationF.Models.Eventet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Author")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Deadline")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProgramId");
-
-                    b.ToTable("Eventet");
                 });
 
             modelBuilder.Entity("AlumniAssociationF.Models.Faq", b =>
@@ -269,31 +218,6 @@ namespace AlumniAssociationF.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Partners");
-                });
-
-            modelBuilder.Entity("AlumniAssociationF.Models.Program", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Programs");
                 });
 
             modelBuilder.Entity("AlumniAssociationF.Models.Studenti", b =>
@@ -678,30 +602,15 @@ namespace AlumniAssociationF.Data.Migrations
                     b.HasDiscriminator().HasValue("User");
                 });
 
-            modelBuilder.Entity("AlumniAssociationF.Models.Event", b =>
+            modelBuilder.Entity("AlumniAssociationF.Models.Events", b =>
                 {
-                    b.HasOne("AlumniAssociationF.Models.OurProgram", null)
+                    b.HasOne("AlumniAssociationF.Models.OurProgram", "OurProgram")
                         .WithMany("Events")
-                        .HasForeignKey("OurProgramId");
-
-                    b.HasOne("AlumniAssociationF.Models.Program", "Program")
-                        .WithMany()
-                        .HasForeignKey("ProgramId")
+                        .HasForeignKey("OurProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Program");
-                });
-
-            modelBuilder.Entity("AlumniAssociationF.Models.Eventet", b =>
-                {
-                    b.HasOne("AlumniAssociationF.Models.Program", "Program")
-                        .WithMany("Events")
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Program");
+                    b.Navigation("OurProgram");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -756,11 +665,6 @@ namespace AlumniAssociationF.Data.Migrations
                 });
 
             modelBuilder.Entity("AlumniAssociationF.Models.OurProgram", b =>
-                {
-                    b.Navigation("Events");
-                });
-
-            modelBuilder.Entity("AlumniAssociationF.Models.Program", b =>
                 {
                     b.Navigation("Events");
                 });
