@@ -142,7 +142,15 @@ namespace AlumniAssociationF.Controllers
             }
             string token = CreateToken(user);
             var refreshToken = GenerateRefreshToken();
-                
+            var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName)
+        };
+            var roles = await userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+
 
             user.RefreshToken = refreshToken.Token;
             user.TokenCreated = refreshToken.Created;
@@ -228,10 +236,21 @@ namespace AlumniAssociationF.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddDays(7),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        
+            var cookieOptions = new CookieOptions
+            {
+            SameSite = SameSiteMode.Strict,
+            HttpOnly = true,
+            Secure = true,
+            Path = "/", // set the same cookie path as in the web project
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("YourCookieName", jwt, cookieOptions);
+
 
             return jwt;
         }

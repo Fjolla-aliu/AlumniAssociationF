@@ -14,52 +14,44 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
 {
     [Area("Admin")]
 
-    //[Authorize(Roles = "Admin")]
+    
     public class UserController : Controller
     {
         private readonly UserManager<IdentityUser> userManager;
         public static User user = new User();
+        private readonly ApplicationDbContext _context;
 
 
-        public UserController( UserManager<IdentityUser> _userManager)
+        public UserController( UserManager<IdentityUser> _userManager,  ApplicationDbContext context)
         {         
             userManager = _userManager;
-
+            _context = context;
         }
 
 
         // GET: UserController
 
         [HttpGet]
+       // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-           // return View(await userManager.Users.ToListAsync());
+          
 
-            var filters = userManager.Users.ToList();
+            return View(await _context.Users.ToListAsync());
 
-            var filter = new List<User>();
-            foreach (var f in filters)
-            {
-              
-                
-                    filter.Add((User)f);
-                
-            }
-
-            
-            return View(filter);
         }
 
         // GET: UserController/Details/5
         [HttpGet]
+       [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || userManager.Users == null)
+            if (id == null || _context.Users == null)
             {
                 return NotFound();
             }
 
-            var studenti = await userManager.Users.FirstOrDefaultAsync(m => m.Id == id.ToString());
+            var studenti = await _context.Users.FirstOrDefaultAsync(m => m.Id == id.ToString());
             if (studenti == null)
             {
                 return NotFound();
@@ -73,14 +65,15 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
 
         // GET: UserController/Edit/5
         [HttpGet]
+      [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string? id)
         {
-            if (id == null || userManager.Users == null)
+            if (id == null || _context.Users == null)
             {
                 return NotFound();
             }
             
-            var studenti =  await userManager.Users.FirstOrDefaultAsync(u => u.Id ==id.ToString());
+            var studenti =  await _context.Users.FirstOrDefaultAsync(u => u.Id ==id.ToString());
             if (studenti == null)
             {
                 return NotFound();
@@ -91,9 +84,10 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
         // POST: UserController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(User u)
         {
-            var user = await userManager.FindByIdAsync(u.Id);
+            var user = await _context.Users.FindAsync(u.Id);
 
             if (user == null)
             {
@@ -113,15 +107,9 @@ namespace AlumniAssociationF.Areas.Admin.Controllers
 
                 
                 
-                var result = await userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("/");
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
+                _context.Update(user);
+               var result=  await _context.SaveChangesAsync();
+               
                 return View(u);
             }
         }

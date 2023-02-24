@@ -11,6 +11,7 @@ using AlumniAssociationF.Models;
 namespace AlumniAssociationF.Areas.Admin.Controllers
 {
     [Area("Admin")]
+
     public class StudentisController : Controller
     {
         private readonly ApplicationDbContext _context;
